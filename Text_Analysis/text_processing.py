@@ -4,6 +4,7 @@ Created on Fri Feb 23 12:37:46 2018
 
 @author: Damon Li
 """
+from collections import defaultdict
 
 import numpy as np
 
@@ -37,7 +38,7 @@ class TextProcessing(object):
     def getchnSTW(self):
         '''Load the stop words txt file.
         '''   
-        stopwords = [line.strip() for line in open(self.chnSTWPath, 'r').readlines()]  
+        stopwords = [line.strip() for line in open(self.chnSTWPath, 'r', encoding='gbk').readlines()]
         return stopwords
 
     def jieba_tokenize(self,documents): 
@@ -85,12 +86,12 @@ class TextProcessing(object):
         token = self.jieba_tokenize(documents) #jieba tokenize
         #corpora_documents = self.RemoveWordAppearOnce(token)  # remove thw words appearing once in the dictionary
         self._dictionary = corpora.Dictionary(token)  # generate dictionary using tokenized documents  
-        if kwarg['saveDict']:
+        if kwarg.get('saveDict'):
             self._dictionary.save(kwarg['saveDictPath']) # store the dictionary, for future reference
         self._BowVecOfEachDoc = [self._dictionary.doc2bow(text) for text in token]  # convert tokenized documents to vectors
-        if kwarg['saveBowvec']:
+        if kwarg.get('saveBowvec'):
             corpora.MmCorpus.serialize(kwarg['saveBowvecPath'], self._BowVecOfEachDoc)  # store to disk, for later use
-        if kwarg['returnValue']:
+        if kwarg.get('returnValue'):
             return token, self._dictionary, self._BowVecOfEachDoc
 
     def CallTransformationModel(self,Dict,Bowvec,**kwarg):

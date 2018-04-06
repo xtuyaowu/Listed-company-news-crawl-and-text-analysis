@@ -1,3 +1,5 @@
+import os
+
 import pymongo
 import tushare as ts
 import datetime
@@ -86,22 +88,28 @@ class CrawlStockData(object):
 		db = self._Conn[dbName]
 		collection = db.get_collection(stockCode)
 		Path = self.stockDailyPath + '\\' + stockCode + '.txt'
-		data = []
+		data = ts.get_k_data(code=stockCode, start='', end='',
+				   ktype='D', autype='qfq',
+				   index=False,
+				   retry_count=3,
+				   pause=0.001)
+		if not os.path.exists(Path):
+			file = open(Path, 'w')
+			file.close()
 		for row in open(Path,'r'):
 			line = row.split()
 			data.append(line)
 		Dict = {}
 		for i in range(len(data)):
-			if len(data[i]) > 1:
-				Dict.update({'date' : data[i][0]})
-				Dict.update({'open' : data[i][1]})
-				Dict.update({'high' : data[i][2]})
-				Dict.update({'low' : data[i][3]})
-				Dict.update({'close' : data[i][4]})
-				Dict.update({'volume' : data[i][5]})
-				Dict.update({'turnover' : data[i][6]})
-				collection.insert_one(Dict)
-				Dict = {}
+			Dict.update({'date' : data['date'][i]})
+			Dict.update({'open' : data['open'][i]})
+			Dict.update({'high' : data['high'][i]})
+			Dict.update({'low' : data['close'][i]})
+			Dict.update({'close' : data['close'][i]})
+			Dict.update({'volume' : data['volume'][i]})
+			Dict.update({'turnover' : ''})
+			collection.insert_one(Dict)
+			Dict = {}
 
 	def getCalendar(self,begin_date):  
 		date_list = []  

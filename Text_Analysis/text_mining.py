@@ -88,7 +88,7 @@ class TextMining(object):
 				title = collection.find_one({'_id':ObjectId(_id)})['Title']
 			article = collection.find_one({'_id':ObjectId(_id)})['Article']
 			articles.append(title + ' ' + article)
-		token, _, _ = self.tp.genDictionary(articles,saveDict=False)
+		token, _, _ = self.tp.genDictionary(articles,saveDict=False, returnValue=True)
 		j = 0
 		for tk in token:
 			relevantStockName = []
